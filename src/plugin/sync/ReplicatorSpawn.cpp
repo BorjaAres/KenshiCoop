@@ -820,6 +820,9 @@ void Replicator::applyFurniturePackets(GameWorld* gw, Inbound& in, NetLink& net,
     localId_ = localId;
     std::deque<InboundFurniture> got;
     in.drainFurniture(got);
+    // Preserve the existing A/B escape hatch: disabled means discard the
+    // channel, not merely stop publishing while received rows still mutate.
+    if (!furnSync_) return;
     for (std::deque<InboundFurniture>::iterator it = got.begin(); it != got.end(); ++it) {
         const FurniturePacket& fp = it->pkt;
         if (fp.ownerId != it->ownerId || fp.on > 1 ||
